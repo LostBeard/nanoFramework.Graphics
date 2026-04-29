@@ -224,6 +224,7 @@
     <Compile Include="Presentation\Window.cs" />
     <Compile Include="Presentation\WindowManager.cs" />
     <Compile Include="Primitive\Bitmap.cs" />
+    <Compile Include="Primitive\DisplayBusType.cs" />
     <Compile Include="Primitive\DisplayControl.cs" />
     <Compile Include="Primitive\DrawTextOptions.cs" />
     <Compile Include="Primitive\GraphicDriver.cs" />
