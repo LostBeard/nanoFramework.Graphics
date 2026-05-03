@@ -99,8 +99,14 @@ namespace nanoFramework.UI.GraphicDrivers
                         DefaultOrientation = DisplayOrientation.Portrait,
 
                         // Init sequence reverse-engineered from Arduino_CO5300.h.cpp.
+                        // SoftwareReset added at top to put the panel into a known state
+                        // before the rest of the sequence - if the chip POR'd in a weird
+                        // state from prior firmware (or from a power-on race with our
+                        // hardware-reset GPIO pulse), SWRESET forces it to defaults.
                         InitializationSequence = new byte[]
                         {
+                            (byte)GraphicDriverCommandType.Command, 1, (byte)CO5300_CMD.SoftwareReset,
+                            (byte)GraphicDriverCommandType.Sleep,   12, // 120 ms after SWRESET per CO5300 spec
                             (byte)GraphicDriverCommandType.Command, 1, (byte)CO5300_CMD.SleepOut,
                             (byte)GraphicDriverCommandType.Sleep,   12, // 120 ms (units of 10 ms)
                             (byte)GraphicDriverCommandType.Command, 2, (byte)CO5300_CMD.VendorPageSelect, 0x00,
@@ -109,7 +115,8 @@ namespace nanoFramework.UI.GraphicDrivers
                             (byte)GraphicDriverCommandType.Command, 2, (byte)CO5300_CMD.CtrlDisplay1, 0x20,
                             (byte)GraphicDriverCommandType.Command, 2, (byte)CO5300_CMD.BrightnessHbm, 0xFF,
                             (byte)GraphicDriverCommandType.Command, 1, (byte)CO5300_CMD.DisplayOn,
-                            (byte)GraphicDriverCommandType.Command, 2, (byte)CO5300_CMD.BrightnessNormal, 0xD0,
+                            (byte)GraphicDriverCommandType.Sleep,   2, // 20ms after DispOn per MIPI DCS
+                            (byte)GraphicDriverCommandType.Command, 2, (byte)CO5300_CMD.BrightnessNormal, 0xFF,
                             (byte)GraphicDriverCommandType.Command, 2, (byte)CO5300_CMD.ContrastEnhancement, 0x00,
                             (byte)GraphicDriverCommandType.Command, 2, (byte)CO5300_CMD.MemoryAccessControl, 0x00,
                             (byte)GraphicDriverCommandType.Sleep,   1, // 10 ms
