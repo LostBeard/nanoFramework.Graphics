@@ -232,6 +232,38 @@ namespace nanoFramework.UI
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         private extern static void Write(string text, ushort x, ushort y, ushort width, ushort height, Font font, uint foreground, uint background);
 
+        /// <summary>
+        /// Puts the panel into sleep mode, running the panel's <c>PowerModeSleep</c> command
+        /// sequence (typically MIPI DCS DISPOFF + SLPIN). On AMOLED panels like CO5300 this
+        /// drops current draw to ~uA - the panel keeps its DDRAM contents and wakes via
+        /// <see cref="Wake"/> with the previously-displayed content intact.
+        /// </summary>
+        /// <remarks>
+        /// Requires the underlying graphic driver descriptor to populate
+        /// <c>GraphicDriver.PowerModeSleep</c>. If the array is empty, this is a no-op.
+        /// </remarks>
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void Sleep();
+
+        /// <summary>
+        /// Brings the panel out of sleep mode by running the descriptor's
+        /// <c>PowerModeNormal</c> command sequence (typically SLPOUT + DISPON, with the
+        /// SLPOUT settling delay). Caller is responsible for repainting the framebuffer
+        /// after wake; on most panels the DDRAM contents survive sleep but the rendered
+        /// state may be stale (e.g. a clock face that ticked while asleep).
+        /// </summary>
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void Wake();
+
+        /// <summary>
+        /// Sets the panel brightness via the descriptor's <c>Brightness</c> command (e.g.
+        /// CO5300 register 0x51, ILI9341 register 0x51). Range and meaning of the byte
+        /// are panel-specific; for CO5300, 0x00 = off, 0xFF = max.
+        /// </summary>
+        /// <param name="level">Panel-native brightness byte (0-255).</param>
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public extern static void SetBrightness(byte level);
+
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         private extern static bool NativeChangeOrientation(DisplayOrientation Orientation);
 
